@@ -653,7 +653,9 @@ class OutputGrading(StudExAction):
     show_invisible_comments = True
 
     def execute(self):
-        if not all(c.visible for c in self.status.all_comments):
+        if 'show_invisible_comments' in self.par_vals:
+            self.show_invisible_comments = self.par_vals.show_invisible_comments
+        elif not all(c.visible for c in self.status.all_comments):
             self.show_invisible_comments = yield EnumPar(YesNo, 'show_invisible_comments',
                                                          'include invisible comments?', remember=True)
         return "\n".join(self.content_string)
