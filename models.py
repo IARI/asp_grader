@@ -722,6 +722,16 @@ class GradingStatus:
             ExerciseComment.ex == self.ex,
             ExerciseComment.student == self.stud)
 
+    @property
+    def gr_comments(self):
+        return Comment.select().join(GradingComment).join(Grading).join(
+            Task).where((Grading.ex == self.ex) | (Task.ex == self.ex))
+
+
+    @property
+    def all_comments(self):
+        return self.gr_comments | self.ex_comments
+
     class Partition:
         def __init__(self, items):
             self.d = {}

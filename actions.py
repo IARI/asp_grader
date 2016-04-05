@@ -649,11 +649,13 @@ class OpenGrading(StudExAction):
 
 
 class OutputGrading(StudExAction):
-    _parameters = [EnumPar(YesNo, 'show_invisible_comments',
-                           'include invisible comments?', remember=True)]
     INDENT = "    "
+    show_invisible_comments = True
 
     def execute(self):
+        if not all(c.visible for c in self.status.all_comments):
+            self.show_invisible_comments = yield EnumPar(YesNo, 'show_invisible_comments',
+                                                         'include invisible comments?', remember=True)
         return "\n".join(self.content_string)
 
     @property
@@ -687,7 +689,7 @@ class OutputGrading(StudExAction):
                 g.status.name) if not g.completed else '')
         for gc in g.comments:
             c = gc.comment
-            if c.visible or self.par_vals.show_invisible_comments:
+            if c.visible or self.show_invisible_comments:
                 yield from wrap_indent(c, indent + ' - ')
                 # for c in [gc.comment for gc in g.comments if gc.comment.visible]:
 
@@ -1834,7 +1836,7 @@ class ScrapeExercise(Action):
         if not year:
             year = yield ListPar(years, 'scrape_year')
 
-        url = "{}{}/".format(self.baseurl,year)
+        url = "{}{}/".format(self.baseurl, year)
 
         d = PyQuery(url=url)
         d.make_links_absolute()

@@ -313,9 +313,9 @@ class GEN_CMD(CLI_CMD):
             r.append(send_val)
             try:
                 subcommand = self.generator.send(send_val)
-            except StopIteration:
-                break
-        return r[1:]
+            except StopIteration as e:
+                return e.value
+                # return r[1:]
 
     class META:
         new_scope = True

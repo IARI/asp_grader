@@ -14,6 +14,7 @@ a tool to manage the exercise grading of the
   include student name, rep and exercise number
 * parse students, grading schemes and more data from text-files
 * comments per exercise, student, (sub)task with point modifiers
+* inisible comments for Tutor/Lecturer
 * output and commit text based gradings
 
 ## Requirements
