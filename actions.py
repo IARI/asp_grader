@@ -1788,7 +1788,7 @@ class ResetExercisePathGrading(ResetExerciseGrading):
 
 
 class ScrapeExercise(Action):
-    url = "http://proglang.informatik.uni-freiburg.de/teaching/androidpracticum/2015/"
+    baseurl = "http://proglang.informatik.uni-freiburg.de/teaching/androidpracticum/"
 
     lastDigits = re.compile(r".*\D+(\d+)(\.pdf)?$", re.I)
 
@@ -1814,7 +1814,29 @@ class ScrapeExercise(Action):
         from pyquery import PyQuery
         from urllib.request import urlretrieve
         from datetime import datetime
-        d = PyQuery(url=self.url)
+        base = PyQuery(url=self.baseurl)
+
+        linktable = base.find('table')
+
+        tdata = self.scrape_table(linktable)
+
+        years = [int(n['Name'][:-1]) for n in tdata if 'Name' in n and re.match(r'\d{4}\/', n['Name'])]
+        default_choice = datetime.now().year
+        #yield Message("available {} current {}".format(years, currentyear))
+
+        if default_choice not in years:
+            default_choice -= 1
+
+        year = None
+        if default_choice in years:
+            if (yield ask('Year {} ?'.format(default_choice))):
+                year = default_choice
+        if not year:
+            year = yield ListPar(years, 'scrape_year')
+
+        url = "{}{}/".format(self.baseurl,year)
+
+        d = PyQuery(url=url)
         d.make_links_absolute()
 
         table = d('h3:contains("Exercise")').next_all('table')

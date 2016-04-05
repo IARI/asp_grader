@@ -4,9 +4,17 @@ a tool to manage the exercise grading of the
 
 ## Features
 
-* parse students, grading schemes and more data from text-files
+* download exercise sheets from for different years from
+    https://proglang.informatik.uni-freiburg.de/teaching/androidpracticum/
+  and add them to database
 * store exercises, students, gradings
-* output commit gradings 
+* roughly validate the project structure of AS projects (android studio projects)
+* automatically check for reports, ignored and required files
+* change the name and label for launcher activities:<br>
+  include student name, rep and exercise number
+* parse students, grading schemes and more data from text-files
+* comments per exercise, student, (sub)task with point modifiers
+* output and commit text based gradings
 
 ## Requirements
 
@@ -52,3 +60,7 @@ from the projects root directory.
 ## Feedback
 
 If you have any questions, remarks or if you find a bug, please use the Issue Tracker.
+
+## Usage
+
+no instructions present yet.
