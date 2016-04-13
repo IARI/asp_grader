@@ -17,6 +17,7 @@ def svn_cmd(rep, cmd, *args):
     cmd_args = list(args)
     try:
         r = rep.run_command(cmd, cmd_args, return_binary=True)
+        print(r.decode())
         # self.svn_cmd(*upd_cmd)
     except (SVNErrorCode.RA_SERF_SSL_CERT_UNTRUSTED.errcls,
             SVNErrorCode.AUTHN_FAILED.errcls,) as e:
@@ -28,8 +29,9 @@ def svn_cmd(rep, cmd, *args):
             password = yield TypePar(str, prompt='password:')
             cmd_args += ['--password', password]
             r = rep.run_command(cmd, cmd_args, return_binary=True)
-
-    print(r.decode())
+            print(r.decode())
+        else:
+            yield Message("Skipping '{} {}'".format(cmd, cmd_args))
 
 
 @unique
@@ -658,6 +660,7 @@ class OutputGrading(StudExAction):
         elif not all(c.visible for c in self.status.all_comments):
             self.show_invisible_comments = yield EnumPar(YesNo, 'show_invisible_comments',
                                                          'include invisible comments?', remember=True)
+        yield Message("Grading output with{} invisible comments.".format("" if self.show_invisible_comments else "out"))
         return "\n".join(self.content_string)
 
     @property
@@ -670,8 +673,10 @@ class OutputGrading(StudExAction):
         if self.status.ex_comments.count():
             yield "\n\nGeneral Comments:"
             for cat in Category:
-                comments = self.status.ex_comments.where(
-                    ExerciseComment.cat == cat)
+                condition = ExerciseComment.cat == cat
+                if not self.show_invisible_comments:
+                    condition &= Comment.visible == True
+                comments = self.status.ex_comments.where(condition)
                 if comments.count():
                     yield cat.name
                     for c in comments:
@@ -1826,7 +1831,7 @@ class ScrapeExercise(Action):
 
         years = [int(n['Name'][:-1]) for n in tdata if 'Name' in n and re.match(r'\d{4}\/', n['Name'])]
         default_choice = datetime.now().year
-        #yield Message("available {} current {}".format(years, currentyear))
+        # yield Message("available {} current {}".format(years, currentyear))
 
         if default_choice not in years:
             default_choice -= 1
