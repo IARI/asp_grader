@@ -534,8 +534,13 @@ class ConfirmExGrading(ExAction):
     def execute(self):
         sl = list(Student)
         for s in sl:
-            yield dict(Student=s)
-            yield ConfirmGrading
+            status = GradingStatus(self.ex, s)
+            if status.completed:
+                yield dict(Student=s)
+                yield ConfirmGrading
+            else:
+                yield Message(
+                    'Correction incomplete.\n{}'.format(status.progress))
 
 
 class CommitPreGradings(ExAction):
